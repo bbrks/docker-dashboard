@@ -1,0 +1,17 @@
+image: golang
+
+before_script:
+  - export PROJECT=${PWD##*/}
+  - export PROJECT_DIR=$GOPATH/src/git.bbrks.me/bbrks/
+  - mkdir -p $PROJECT_DIR
+  - mv $PWD $PROJECT_DIR
+  - cd $PROJECT_DIR/$PROJECT
+  - go version
+  - which go
+  - echo $PWD
+  - ls -l
+
+build:
+  stage: build
+  script:
+    - make image
