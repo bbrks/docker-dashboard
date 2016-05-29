@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="refresh" content="5" >
+        <title>Docker Dashboard</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                font: 20px sans-serif;
+                color: #ebebeb;
+                background: #2b3e50;
+                margin: 0 10px;
+            }
+            li {
+                display: inline-block;
+                text-align: center;
+                width: 33.3%;
+                padding: 10px 0;
+                margin: 10px 0;
+            }
+            li.exited { background: #bd2d29 }
+            li.running { background: #2f6a2f }
+            li.created { background: #4e5d6c }
+        </style>
+    </head>
+    <body>
+        <h1>{{ .H }}</h1>
+        <ul>{{range .C}}<li class="{{.State}}">{{.Image}} - {{.Status}}</li>{{end}}</ul>
+    </body>
+</html>
