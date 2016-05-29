@@ -3,6 +3,6 @@ docker-dashboard:
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
   environment:
-    - TRIM_IMAGE_PREFIX="leopardsoftware/"
+    - TRIM_IMAGE_PREFIX="bbrks/"
   ports:
     - 8080:8080
