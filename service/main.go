@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/docker/engine-api/client"
@@ -44,7 +45,7 @@ func getContainers() []types.Container {
 	}
 
 	for _, c := range containers {
-		c.Image = strings.TrimPrefix(c.Image, "leopardsoftware/")
+		c.Image = strings.TrimPrefix(c.Image, os.Getenv("TRIM_IMAGE_PREFIX"))
 	}
 
 	return containers

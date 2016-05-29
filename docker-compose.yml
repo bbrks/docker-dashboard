@@ -2,5 +2,7 @@ docker-dashboard:
   image: bbrks/docker-dashboard
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
+  environment:
+    - TRIM_IMAGE_PREFIX="leopardsoftware/"
   ports:
     - 8080:8080
