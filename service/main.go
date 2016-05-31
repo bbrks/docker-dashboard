@@ -1,22 +1,24 @@
 package main
 
 import (
+	"bytes"
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
-	"github.com/docker/engine-api/client"
-	"github.com/docker/engine-api/types"
-	"golang.org/x/net/context"
+	"github.com/fsouza/go-dockerclient"
 )
 
-var t *template.Template
+var (
+	t *template.Template
+	c *docker.Client
+)
 
 type page struct {
-	C []types.Container
-	H string
+	C         []docker.APIContainers
+	Container docker.Container
+	CID, H, L string
 }
 
 func main() {
@@ -26,29 +28,50 @@ func main() {
 		panic(err)
 	}
 
+	c, err = docker.NewClient("unix:///var/run/docker.sock")
+	if err != nil {
+		panic(err)
+	}
+
+	http.HandleFunc("/logs/", logHandler)
 	http.HandleFunc("/", handler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 
 }
 
-func getContainers() []types.Container {
-	defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
-	cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, defaultHeaders)
+func getContainers() []docker.APIContainers {
+	containers, err := c.ListContainers(docker.ListContainersOptions{All: true})
 	if err != nil {
 		panic(err)
-	}
-
-	options := types.ContainerListOptions{All: true}
-	containers, err := cli.ContainerList(context.Background(), options)
-	if err != nil {
-		panic(err)
-	}
-
-	for _, c := range containers {
-		c.Image = strings.TrimPrefix(c.Image, os.Getenv("TRIM_IMAGE_PREFIX"))
 	}
 
 	return containers
+}
+
+func getLogs(cID string) string {
+	var buf bytes.Buffer
+	c.Logs(docker.LogsOptions{
+		Container:    cID,
+		OutputStream: &buf,
+		Stdout:       true,
+		Stderr:       true,
+		RawTerminal:  true,
+		Timestamps:   true,
+		Tail:         "50",
+	})
+	return buf.String()
+}
+
+func logHandler(w http.ResponseWriter, r *http.Request) {
+	cID := strings.Split(r.URL.Path, "/")[2]
+	p := page{
+		L: getLogs(cID),
+		H: r.Host,
+	}
+	err := t.Execute(w, p)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {

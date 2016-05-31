@@ -2,7 +2,6 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="refresh" content="5" >
         <title>Docker Dashboard</title>
         <style>
             * {
@@ -21,13 +20,30 @@
                 width: 33.3%;
                 padding: 10px 0;
             }
+            a {
+                color: #ebebeb;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+            pre {
+                font-size: 16px;
+                background: #4e5d6c;
+                overflow: scroll;
+            }
             li.exited { background: #bd2d29 }
             li.running { background: #2f6a2f }
             li.created { background: #4e5d6c }
         </style>
     </head>
     <body>
-        <h1>{{ .H }}</h1>
-        <ul>{{range .C}}<li class="{{.State}}">{{.Image}} - {{.Status}}</li>{{end}}</ul>
+        <h1><a href="/">{{.H}}</a></h1>
+        {{if .C}}
+            <ul>{{range .C}}{{ if eq .State "exited" }}<a href="/logs/{{.ID}}"><li class="{{.State}}">{{.Image}}<br/>{{index .Names 0}}<br/>{{.Status}}</li></a>{{else}}<li class="{{.State}}">{{.Image}}<br/>{{index .Names 0}}<br/>{{.Status}}</li>{{end}}{{end}}</ul>
+        {{else}}
+            <h3>Container Logs</h3>
+            <pre>{{.L}}</pre>
+        {{end}}
     </body>
 </html>
