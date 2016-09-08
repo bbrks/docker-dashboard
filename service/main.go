@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"sort"
 	"strings"
 
 	"github.com/fsouza/go-dockerclient"
@@ -20,6 +21,12 @@ type page struct {
 	Container docker.Container
 	CID, H, L string
 }
+
+type containers []docker.APIContainers
+
+func (a containers) Len() int           { return len(a) }
+func (a containers) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a containers) Less(i, j int) bool { return a[i].Image < a[j].Image }
 
 func main() {
 	var err error
@@ -40,12 +47,14 @@ func main() {
 }
 
 func getContainers() []docker.APIContainers {
-	containers, err := c.ListContainers(docker.ListContainersOptions{All: true})
+	cnt, err := c.ListContainers(docker.ListContainersOptions{All: true})
 	if err != nil {
 		panic(err)
 	}
 
-	return containers
+	sort.Sort(containers(cnt))
+
+	return cnt
 }
 
 func getLogs(cID string) string {

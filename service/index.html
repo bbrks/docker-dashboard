@@ -9,16 +9,16 @@
                 padding: 0;
             }
             body {
-                font: 20px sans-serif;
+                font: 16px sans-serif;
                 color: #ebebeb;
                 background: #2b3e50;
-                margin: 0 10px;
+                margin: 0 5px;
             }
             li {
                 display: inline-block;
                 text-align: center;
                 width: 33.3%;
-                padding: 10px 0;
+                padding: 5px 0;
             }
             a {
                 color: #ebebeb;
@@ -27,20 +27,26 @@
             a:hover {
                 text-decoration: underline;
             }
+            h1 {
+                font-size: 4em;
+            }
             pre {
                 font-size: 16px;
                 background: #4e5d6c;
                 overflow: scroll;
             }
-            li.exited { background: #bd2d29 }
+            li.exited, li.restarting { background: #bd2d29 }
             li.running { background: #2f6a2f }
             li.created { background: #4e5d6c }
+            .lg {
+              font-size: 20px;
+            }
         </style>
     </head>
     <body>
         <h1><a href="/">{{.H}}</a></h1>
         {{if .C}}
-            <ul>{{range .C}}{{ if eq .State "exited" }}<a href="/logs/{{.ID}}"><li class="{{.State}}">{{.Image}}<br/>{{index .Names 0}}<br/>{{.Status}}</li></a>{{else}}<li class="{{.State}}">{{.Image}}<br/>{{index .Names 0}}<br/>{{.Status}}</li>{{end}}{{end}}</ul>
+            <ul>{{range .C}}<a href="/logs{{index .Names 0}}"><li class="{{.State}}"><span class="lg">{{.Image}}</span><br/>{{index .Names 0}}<br/>{{.Status}}</li></a>{{end}}</ul>
         {{else}}
             <h3>Container Logs</h3>
             <pre>{{.L}}</pre>
